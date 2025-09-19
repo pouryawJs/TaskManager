@@ -1,17 +1,19 @@
 {
-  "name": "task-manager",
-  "version": "1.0.0",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": "",
-  "dependencies": {
-    "dotenv": "^17.2.2",
-    "mongoose": "^8.18.1",
-    "telegraf": "^4.16.3"
-  }
+	"name": "task-manager",
+	"version": "1.0.0",
+	"main": "index.js",
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1",
+		"start": "nodemon ./src/bot/bot.js"
+	},
+	"keywords": [],
+	"author": "",
+	"license": "ISC",
+	"description": "",
+	"dependencies": {
+		"dotenv": "^17.2.2",
+		"mongoose": "^8.18.1",
+		"nodemon": "^3.1.10",
+		"telegraf": "^4.16.3"
+	}
 }
