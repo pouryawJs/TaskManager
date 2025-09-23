@@ -2,17 +2,14 @@ require("dotenv").config();
 const configs = require("./configs");
 require("./src/configs/db")();
 const { Telegraf, Markup } = require("telegraf");
+const setupHandlers = require("./src/bot/index");
 
 const bot = new Telegraf(configs.bot.token);
 
-bot.start((ctx) =>
-	ctx.reply(
-		"Welcome",
-		Markup.inlineKeyboard([[Markup.button.callback("پروفایل", "profile")]])
-	)
-);
+//* Handler
+setupHandlers(bot);
 
-bot.hears("hi", (ctx) => ctx.reply("Hey there"));
+//* Launch
 bot.launch(() => {
 	console.log("Bot Launch successfully!😊");
 });
