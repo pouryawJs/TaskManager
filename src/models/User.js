@@ -2,9 +2,9 @@ const mongoose = require("mongoose");
 
 const userSchema = new mongoose.Schema(
 	{
-		telegram_id: { type: String, required: true },
+		_id: { type: String, required: true },
 		score: { type: Number, default: 0 },
-		end_time: { type: Number, default: 0 },
+		end_time: { type: String, default: "00:00" },
 	},
 	{ timestamp: true, versionKey: false }
 );

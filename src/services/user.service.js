@@ -1,20 +1,20 @@
 const UserModel = require("./../models/User");
 const jalaali = require("jalaali-js");
 
-exports.isExistsUser = async (tgID) => {
-	const user = await UserModel.findOne({ telegram_id: tgID });
+exports.isExistsUser = async (userID) => {
+	const user = await UserModel.findOne({ _id: userID });
 
 	return user ? user : false;
 };
 
-exports.createUser = async (tgID) => {
-	const user = await UserModel.create({ telegram_id: tgID });
+exports.createUser = async (userID) => {
+	const user = await UserModel.create({ _id: userID });
 
 	return user ? user : false;
 };
 
-exports.getUserCurrentDayTag = async (tgID) => {
-	const user = await UserModel.findOne({ telegram_id: tgID });
+exports.getUserCurrentDayTag = async (userID) => {
+	const user = await UserModel.findOne({ _id: userID });
 
 	const now = new Date();
 

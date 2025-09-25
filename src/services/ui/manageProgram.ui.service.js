@@ -1,5 +1,7 @@
 const manageProgramMessage = require("../../bot/messages/manageProgram.message");
 const manageProgramKeyboard = require("../../bot/keyboards/manageProgram.keyboard");
+const taskService = require("./../task.service");
+const userService = require("./../user.service");
 
 exports.showProgramManagementMenu = async (ctx) => {
 	await ctx.editMessageText(manageProgramMessage.mainManageProgramMenu(), {
@@ -9,16 +11,26 @@ exports.showProgramManagementMenu = async (ctx) => {
 };
 
 exports.showTodayTaskMenu = async (ctx) => {
-	await ctx.editMessageText(manageProgramMessage.todayTasks(), {
+	const userID = ctx.from.id;
+
+	const dayTag = await userService.getUserCurrentDayTag(userID);
+	const tasks = await taskService.getUserTasksByDayTag(userID, dayTag);
+
+	await ctx.editMessageText(manageProgramMessage.todayTasks(tasks), {
 		parse_mode: "HTML",
 		...manageProgramKeyboard.todayTasks(),
 	});
 };
 
 exports.showDeleteTaskMenu = async (ctx) => {
-	await ctx.editMessageText(manageProgramMessage.deleteTask(), {
+	const userID = ctx.from.id;
+
+	const dayTag = await userService.getUserCurrentDayTag(userID);
+	const tasks = await taskService.getUserTasksByDayTag(userID, dayTag);
+
+	await ctx.editMessageText(manageProgramMessage.deleteTask(tasks), {
 		parse_mode: "HTML",
-		...manageProgramKeyboard.deleteTask(),
+		...manageProgramKeyboard.deleteTask(tasks),
 	});
 };
 

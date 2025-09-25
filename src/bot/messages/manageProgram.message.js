@@ -14,7 +14,24 @@ exports.mainManageProgramMenu = () => {
 };
 
 //* TODAY TASKS MESSAGES
-exports.todayTasks = () => {
+const formatTasksListMessage = (tasks) => {
+	if (!tasks || tasks.length === 0) {
+		return "تسکی برای نمایش وجود ندارد.";
+	}
+
+	return tasks
+		.map((task, index) => {
+			const tagID = task._id.toString().slice(-4);
+			return `<b>تسک شماره (${index + 1}) : #${tagID}</b>
+🔹 <b>عنوان:</b> ${task.title || "-"}
+⏰ <b>بازه زمانی:</b> ${task.start || "-"} تا ${task.end || "-"}
+📌 <b>وضعیت فعلی:</b> ${task.status || "-"}`;
+		})
+		.join("\n\n");
+};
+
+exports.todayTasks = (tasks) => {
+	const tasksList = formatTasksListMessage(tasks);
 	return `
 <b><i>📅 برنامه امروز</i></b>
 
@@ -25,6 +42,7 @@ exports.todayTasks = () => {
 <b>2️⃣ حذف تسک</b> : برای حذف یک تسک از لیست تسک های امروز.
 
 ⬇️ لیست تسک‌ های امروزت:
+${tasksList}
 `;
 };
 
@@ -50,7 +68,7 @@ exports.addTask = () => {
 };
 
 exports.deleteTask = (tasks) => {
-	//! NEED TO DEVELOPMENT
+	const tasksList = formatTasksListMessage(tasks);
 	return `
 <b><i>🗑️ حذف تسک</i></b>
 
@@ -60,6 +78,7 @@ exports.deleteTask = (tasks) => {
 برای حذف، فقط شماره‌ی تسک رو از لیست انتخاب کن و روی دکمه شیشه ای که با شماره تسک انتخابیت یکسان هست کلیک کن  .  
 
 ⬇️ لیست تسک‌ های امروزت:
+${tasksList}
 `;
 };
 

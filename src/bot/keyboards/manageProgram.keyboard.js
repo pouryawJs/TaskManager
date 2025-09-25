@@ -59,6 +59,34 @@ const buildPastDaysKeyboard = (page = 1, count = 7) => {
 	return buttons;
 };
 
+const buildTaskTagsKeyboard = (tasks) => {
+	let rowTagLimit = 3; // Limit of tags per row
+	let rowTagCounter = 0; // Counter for dates in the current row
+	let currentRow = []; // Current row of buttons
+
+	const buttons = [];
+
+	tasks.forEach((task) => {
+		const tag = task._id.toString().slice(-4);
+		currentRow.push(
+			Markup.button.callback(tag, `TASK_DELETE_${task._id.toString()}`)
+		);
+		rowTagCounter++;
+		if (rowTagCounter === rowTagLimit) {
+			buttons.push(currentRow);
+			currentRow = [];
+			rowTagCounter = 0;
+		}
+	});
+	if (currentRow.length) {
+		buttons.push(currentRow);
+		currentRow = [];
+	}
+	buttons.push([Markup.button.callback("⬅️ برگشت", "TODAY_TASKS")]);
+
+	return buttons;
+};
+
 exports.mainManageProgramMenu = () =>
 	Markup.inlineKeyboard([
 		[
@@ -81,11 +109,11 @@ exports.addTask = () =>
 		[Markup.button.callback("⬅️ برگشت", "TODAY_TASKS")],
 	]);
 
-//! NEED TO DEVELOPMENT
-exports.deleteTask = () =>
-	Markup.inlineKeyboard([
-		[Markup.button.callback("⬅️ برگشت", "TODAY_TASKS")],
-	]);
+exports.deleteTask = (tasks) => {
+	const buttons = buildTaskTagsKeyboard(tasks);
+
+	return Markup.inlineKeyboard(buttons);
+};
 
 exports.analysTasks = () =>
 	Markup.inlineKeyboard([

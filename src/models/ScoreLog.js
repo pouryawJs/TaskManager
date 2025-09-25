@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 
 const scoreLog = new mongoose.Schema(
 	{
-		user: { type: mongoose.Types.ObjectId, ref: "User", required: true },
+		user: { type: String, ref: "User", required: true },
 		score: { type: Number, required: true },
 		reason: { type: String, required: true },
 	},

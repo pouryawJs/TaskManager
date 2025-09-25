@@ -2,6 +2,8 @@ const manageProgramKeyboard = require("./../keyboards/manageProgram.keyboard");
 const manageProgramMessage = require("./../messages/manageProgram.message");
 const safeAction = require("./../../utils/safeAction");
 const manageProgramUI = require("./../../services/ui/manageProgram.ui.service");
+const taskService = require("./../../services/task.service");
+const sendReplyAndDelete = require("../../utils/sendReplyAndDelete");
 
 module.exports = (bot) => {
 	safeAction(
@@ -24,6 +26,19 @@ module.exports = (bot) => {
 		"DELETE_TASK",
 		async (ctx) => await manageProgramUI.showDeleteTaskMenu(ctx)
 	);
+
+	safeAction(bot, /^TASK_DELETE_(.+)$/, async (ctx) => {
+		const taskID = ctx.match[1];
+
+		await taskService.deleteTaskByID(taskID);
+		await manageProgramUI.showDeleteTaskMenu(ctx);
+		await sendReplyAndDelete(
+			ctx,
+			"تسک مورد نظر با موفقیت حذف شد 🗑✅",
+			undefined,
+			3000
+		);
+	});
 
 	//* PAST TASKS HANDLERS
 	safeAction(
