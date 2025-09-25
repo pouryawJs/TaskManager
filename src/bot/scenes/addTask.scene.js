@@ -4,6 +4,7 @@ const manageProgramMessage = require("./../messages/manageProgram.message");
 const manageProgramKeyboard = require("./../keyboards/manageProgram.keyboard");
 const taskService = require("./../../services/task.service");
 const userService = require("./../../services/user.service");
+const manageProgramUI = require("./../../services/ui/manageProgram.ui.service");
 
 const TASK_REGEX =
 	/^(.+?)\s+از\s+([0-2]?\d:[0-5]\d)\s+تا\s+([0-2]?\d:[0-5]\d)\s*$/i;
@@ -58,13 +59,7 @@ const addTaskScene = new WizardScene(
 			await ctx.answerCbQuery().catch(() => null);
 			ctx.scene.leave();
 
-			return await ctx.editMessageText(
-				manageProgramMessage.todayTasks(),
-				{
-					parse_mode: "HTML",
-					...manageProgramKeyboard.todayTasks(),
-				}
-			);
+			return await manageProgramUI.showTodayTaskMenu(ctx);
 		}
 
 		const userTgID = ctx.from.id;
