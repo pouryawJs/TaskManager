@@ -1,5 +1,6 @@
 const manageProgramKeyboard = require("./../keyboards/manageProgram.keyboard");
 const manageProgramMessage = require("./../messages/manageProgram.message");
+const safeAction = require("./../../utils/safeAction");
 
 module.exports = (bot) => {
 	bot.action("PROGRAM_MANAGEMENT", (ctx) => {
@@ -10,19 +11,16 @@ module.exports = (bot) => {
 	});
 
 	//* TODAY TASKS HANDLERS
-
-	bot.action("TODAY_TASKS", (ctx) => {
-		ctx.editMessageText(manageProgramMessage.todayTasks(), {
+	safeAction(bot, "TODAY_TASKS", async (ctx) => {
+		await ctx.editMessageText(manageProgramMessage.todayTasks(), {
 			parse_mode: "HTML",
 			...manageProgramKeyboard.todayTasks(),
 		});
 	});
 
-	bot.action("ADD_TASK", (ctx) => {
-		ctx.editMessageText(manageProgramMessage.addTask(), {
-			parse_mode: "HTML",
-			...manageProgramKeyboard.addTask(),
-		});
+	bot.action("ADD_TASK", async (ctx) => {
+		await ctx.answerCbQuery();
+		return ctx.scene.enter("ADD_TASK_SCENE");
 	});
 
 	bot.action("DELETE_TASK", (ctx) => {
