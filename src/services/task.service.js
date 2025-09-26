@@ -30,3 +30,32 @@ exports.deleteTaskByID = async (taskID) => {
 	await TaskModel.findByIdAndDelete(taskID);
 	return;
 };
+
+exports.findTasksByStartTime = async (start) => {
+	const tasks = await TaskModel.find({
+		start,
+		isSentNotification: false,
+	}).lean();
+
+	return tasks;
+};
+
+exports.updateTaskStatus = async (taskID, status) => {
+	const updatedTask = await TaskModel.findByIdAndUpdate(
+		taskID,
+		{ status },
+		{ new: true }
+	);
+
+	return updatedTask ? updatedTask : false;
+};
+
+exports.updateTasksAfterSentNotification = async (tasks) => {
+	await TaskModel.bulkWrite(tasks);
+	return;
+};
+
+exports.isFirstTaskInDayTag = async (userID, dayTag) => {
+	const task = await TaskModel.findOne({ user: userID, dayTag });
+	return task ? false : true;
+};

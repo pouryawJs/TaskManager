@@ -2,6 +2,16 @@ const manageProgramMessage = require("../../bot/messages/manageProgram.message")
 const manageProgramKeyboard = require("../../bot/keyboards/manageProgram.keyboard");
 const taskService = require("./../task.service");
 const userService = require("./../user.service");
+const { getTaskDurtationInMinute } = require("../../utils/dateUtils");
+const sendReplyAndDelete = require("../../utils/sendReplyAndDelete");
+const {
+	startTaskReward,
+	doneTaskReward,
+	notDoneTaskReward,
+	halfDoneTaskReward,
+	cancelTaskReward,
+} = require("../score.service");
+const { sendLog } = require("../../utils/scoreLog");
 
 exports.showProgramManagementMenu = async (ctx) => {
 	await ctx.editMessageText(manageProgramMessage.mainManageProgramMenu(), {
@@ -36,11 +46,30 @@ exports.showDeleteTaskMenu = async (ctx) => {
 
 exports.showPastDaysMenu = async (ctx) => {
 	const page = parseInt(ctx.match[1], 10);
-	await ctx.answerCbQuery();
-	ctx.editMessageText(manageProgramMessage.pastDays(), {
+
+	await ctx.editMessageText(manageProgramMessage.pastDays(), {
 		parse_mode: "HTML",
 		...manageProgramKeyboard.pastDays(page),
 	});
+};
+
+exports.showDayTasks = async (ctx) => {
+	const dayTag = ctx.match[1];
+	const userID = ctx.from.id;
+
+	const tasks = await taskService.getUserTasksByDayTag(userID, dayTag);
+
+	if (!tasks) {
+		return await ctx.editMessageText(
+			manageProgramMessage.notFoundTask(dayTag),
+			{
+				parse_mode: "HTML",
+				...manageProgramKeyboard.pastDays(page),
+			}
+		);
+	}
+
+	//! DEVELOPE
 };
 
 exports.showAnalysTasksMenu = async (ctx) => {
@@ -48,4 +77,142 @@ exports.showAnalysTasksMenu = async (ctx) => {
 		parse_mode: "HTML",
 		...manageProgramKeyboard.analysTasks(),
 	});
+};
+
+exports.showStartedTask = async (bot, task) => {
+	const duration = getTaskDurtationInMinute(task.start, task.end);
+	await bot.telegram.sendMessage(
+		task.user,
+		manageProgramMessage.startedTask(task, duration),
+		{
+			parse_mode: "HTML",
+			...manageProgramKeyboard.startedTask(task._id),
+		}
+	);
+};
+
+exports.showInProgressTask = async (ctx) => {
+	const taskID = ctx.match[1];
+
+	const task = await taskService.updateTaskStatus(taskID, "درحال انجام 🟡");
+
+	if (!task) {
+		return await sendReplyAndDelete(
+			ctx,
+			"یه خطایی پیش اومد، دوباره امتحان کن 🚧",
+			undefined,
+			5000
+		);
+	}
+
+	//* Check Eligiblity to get score
+	const result = await startTaskReward(task);
+
+	if (result.isEligible) {
+		await sendLog(ctx, result, true);
+	}
+
+	const duration = getTaskDurtationInMinute(task.start, task.end);
+	await ctx.editMessageText(
+		manageProgramMessage.InProgressTask(task, duration),
+		{
+			parse_mode: "HTML",
+			...manageProgramKeyboard.InProgressTask(task._id),
+		}
+	);
+};
+
+exports.cancelTaskLogic = async (ctx) => {
+	const taskID = ctx.match[1];
+	const messageID = ctx.callbackQuery?.message?.message_id;
+
+	const task = await taskService.updateTaskStatus(taskID, "لغو شده ⛔️");
+	if (!task) {
+		return await sendReplyAndDelete(
+			ctx,
+			"یه خطایی پیش اومد، دوباره امتحان کن 🚧",
+			undefined,
+			5000
+		);
+	}
+	//* Calculate and give score to user
+	const chatID = task.user;
+	await ctx.telegram.deleteMessage(chatID, messageID);
+
+	const duration = getTaskDurtationInMinute(task.start, task.end);
+	const result = await cancelTaskReward(chatID, duration);
+
+	return sendLog(ctx, result, true);
+};
+
+exports.doneTaskLogic = async (ctx) => {
+	const taskID = ctx.match[1];
+	const messageID = ctx.callbackQuery?.message?.message_id;
+
+	const task = await taskService.updateTaskStatus(taskID, "تکمیل شده 🟢");
+	if (!task) {
+		return await sendReplyAndDelete(
+			ctx,
+			"یه خطایی پیش اومد، دوباره امتحان کن 🚧",
+			undefined,
+			5000
+		);
+	}
+	//* Calculate and give score to user
+	const chatID = task.user;
+	await ctx.telegram.deleteMessage(chatID, messageID);
+
+	const duration = getTaskDurtationInMinute(task.start, task.end);
+	const result = await doneTaskReward(chatID, duration);
+
+	return sendLog(ctx, result, true);
+};
+
+exports.halfDoneTaskLogic = async (ctx) => {
+	const taskID = ctx.match[1];
+	const messageID = ctx.callbackQuery?.message?.message_id;
+
+	const task = await taskService.updateTaskStatus(
+		taskID,
+		"نیمه تمام ماند 🟤"
+	);
+	if (!task) {
+		return await sendReplyAndDelete(
+			ctx,
+			"یه خطایی پیش اومد، دوباره امتحان کن 🚧",
+			undefined,
+			5000
+		);
+	}
+	//* Calculate and give score to user
+	const chatID = task.user;
+	await ctx.telegram.deleteMessage(chatID, messageID);
+
+	const duration = getTaskDurtationInMinute(task.start, task.end);
+	const result = await halfDoneTaskReward(chatID, duration);
+
+	return sendLog(ctx, result, true);
+};
+
+exports.notDoneTaskLogic = async (ctx) => {
+	const taskID = ctx.match[1];
+	const messageID = ctx.callbackQuery?.message?.message_id;
+
+	const task = await taskService.updateTaskStatus(taskID, "انجام نشد 🔴");
+	if (!task) {
+		return await sendReplyAndDelete(
+			ctx,
+			"یه خطایی پیش اومد، دوباره امتحان کن 🚧",
+			undefined,
+			5000
+		);
+	}
+	//* Calculate and give score to user
+	const chatID = task.user;
+	await ctx.telegram.deleteMessage(chatID, messageID);
+
+	const duration = getTaskDurtationInMinute(task.start, task.end);
+	const result = await notDoneTaskReward(chatID, duration);
+
+	return sendLog(ctx, result, false);
 };

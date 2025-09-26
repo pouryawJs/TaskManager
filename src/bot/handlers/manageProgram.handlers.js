@@ -4,6 +4,7 @@ const safeAction = require("./../../utils/safeAction");
 const manageProgramUI = require("./../../services/ui/manageProgram.ui.service");
 const taskService = require("./../../services/task.service");
 const sendReplyAndDelete = require("../../utils/sendReplyAndDelete");
+const { getTehranTime } = require("../../utils/dateUtils");
 
 module.exports = (bot) => {
 	safeAction(
@@ -39,12 +40,35 @@ module.exports = (bot) => {
 			3000
 		);
 	});
+	//* TASK MANAGEMENT
+	safeAction(bot, /^PROGRESS_TASK_(.+)$/, async (ctx) =>
+		manageProgramUI.showInProgressTask(ctx)
+	);
 
+	safeAction(bot, /^DONE_TASK_(.+)$/, async (ctx) =>
+		manageProgramUI.doneTaskLogic(ctx)
+	);
+
+	safeAction(bot, /^HALF_DONE_TASK_(.+)$/, async (ctx) =>
+		manageProgramUI.halfDoneTaskLogic(ctx)
+	);
+
+	safeAction(bot, /^NOT_DONE_TASK_(.+)$/, async (ctx) =>
+		manageProgramUI.notDoneTaskLogic(ctx)
+	);
+
+	safeAction(bot, /^CANCEL_TASK_(.+)$/, async (ctx) =>
+		manageProgramUI.cancelTaskLogic(ctx)
+	);
 	//* PAST TASKS HANDLERS
 	safeAction(
 		bot,
 		/PAST_DAYS_PAGE_(\d+)$/,
 		async (ctx) => await manageProgramUI.showPastDaysMenu(ctx)
+	);
+
+	safeAction(bot, /^DAY_(.+)$/, async (ctx) =>
+		manageProgramUI.showDayTasks(ctx)
 	);
 	//* GUIDE TASKS HANDLERS
 

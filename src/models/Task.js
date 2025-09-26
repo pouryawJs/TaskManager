@@ -11,14 +11,16 @@ const taskSchema = new mongoose.Schema(
 				"شروع نشده ⚪️",
 				"تکمیل شده 🟢",
 				"درحال انجام 🟡",
-				"نیمه تمام مانده است 🟤",
+				"نیمه تمام ماند 🟤",
 				"انجام نشد 🔴",
+				"لغو شده ⛔️",
 			],
 		},
 		start: { type: String, required: true },
 		end: { type: String, required: true },
 		dayTag: { type: String, required: true },
 		user: { type: String, ref: "User", required: true },
+		isSentNotification: { type: Boolean, default: false },
 	},
 	{ timestamp: true, versionKey: false }
 );

@@ -37,3 +37,23 @@ exports.getUserCurrentDayTag = async (userID) => {
 
 	return `${year}/${month}/${day}`;
 };
+
+exports.updateUserScore = async (userID, amount) => {
+	const updatedUser = await UserModel.findByIdAndUpdate(
+		userID,
+		{ $inc: { score: amount } },
+		{ new: true }
+	).select("_id score");
+
+	return updatedUser ? updatedUser : false;
+};
+
+exports.getLimitTimeInMinute = async (userID) => {
+	const user = await UserModel.findById(userID);
+
+	const end = user.end_time;
+	const [hour, minute] = end.split(":").map(Number);
+	const endInMinute = hour * 60 + minute;
+
+	return endInMinute + 8 * 60; // 8 hour after end day
+};

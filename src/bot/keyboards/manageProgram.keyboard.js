@@ -124,3 +124,21 @@ exports.pastDays = (page = 1) => {
 	const buttons = buildPastDaysKeyboard(page, 7);
 	return Markup.inlineKeyboard(buttons);
 };
+
+exports.startedTask = (taskID) =>
+	Markup.inlineKeyboard([
+		[Markup.button.callback("شروع فعالیت ✅", `PROGRESS_TASK_${taskID}`)],
+		[Markup.button.callback("لغو تسک ⛔️", `CANCEL_TASK_${taskID}`)],
+	]);
+
+exports.InProgressTask = (taskID) =>
+	Markup.inlineKeyboard([
+		[Markup.button.callback("✅ تکمیل شد", `DONE_TASK_${taskID}`)],
+		[
+			Markup.button.callback(
+				"⚡ نیمه‌تمام ماند",
+				`HALF_DONE_TASK_${taskID}`
+			),
+		],
+		[Markup.button.callback("🚫 انجام ندادم", `NOT_DONE_TASK_${taskID}`)],
+	]);

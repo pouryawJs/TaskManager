@@ -6,16 +6,24 @@ const taskService = require("./../../services/task.service");
 const userService = require("./../../services/user.service");
 const manageProgramUI = require("./../../services/ui/manageProgram.ui.service");
 const sendReplyAndDelete = require("../../utils/sendReplyAndDelete");
+const { getCurrentTimeInMinute } = require("../../utils/dateUtils");
+const {
+	firstTaskOfDayReward,
+	firstTaskOfDayPunish,
+} = require("../../services/score.service");
+const { sendLog } = require("../../utils/scoreLog");
 
 const TASK_REGEX =
-	/^(.+?)\s+از\s+([0-2]?\d:[0-5]\d)\s+تا\s+([0-2]?\d:[0-5]\d)\s*$/i;
+	/^(.+?)\s+از\s+([01]\d|2[0-3]):([0-5]\d)\s+تا\s+([01]\d|2[0-3]):([0-5]\d)\s*$/;
 
 const parseTaskProperties = (text) => {
 	const taskMessage = text.trim().match(TASK_REGEX);
 	if (!taskMessage) return null;
+
 	const title = taskMessage[1].trim();
-	const start = taskMessage[2];
-	const end = taskMessage[3];
+	const start = `${taskMessage[2]}:${taskMessage[3]}`;
+	const end = `${taskMessage[4]}:${taskMessage[5]}`;
+
 	return { title, start, end };
 };
 
@@ -35,7 +43,7 @@ const addTaskScene = new WizardScene(
 	},
 	async (ctx) => {
 		try {
-			if (ctx.callbackQuery?.data === "TODAY_TASKS") {
+			if (ctx.callbackQuery?.data) {
 				await ctx.answerCbQuery().catch(() => null);
 				ctx.scene.leave();
 
@@ -65,7 +73,25 @@ const addTaskScene = new WizardScene(
 				}
 				tasks.push({ ...taskProperties, dayTag, user: userID });
 			}
+			//* Reward/Punish Calculation
+			const isFirstTask = await taskService.isFirstTaskInDayTag(
+				userID,
+				dayTag
+			);
+			if (isFirstTask) {
+				const currentTime = getCurrentTimeInMinute();
+				const userLimitTimeToGetReward =
+					await userService.getLimitTimeInMinute(userID);
+				if (currentTime <= userLimitTimeToGetReward) {
+					const result = await firstTaskOfDayReward(userID);
+					await sendLog(ctx, result, true);
+				} else {
+					const result = await firstTaskOfDayPunish(userID);
+					await sendLog(ctx, result, false);
+				}
+			}
 
+			//* add Task to DB
 			const addTasksResult = await taskService.insertManyTasks(tasks);
 
 			if (!addTasksResult) {
@@ -77,7 +103,7 @@ const addTaskScene = new WizardScene(
 					45000
 				);
 			}
-
+			//* Response
 			await ctx.telegram.deleteMessage(chatID, messageID);
 			await sendReplyAndDelete(
 				ctx,
