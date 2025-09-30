@@ -5,6 +5,7 @@ const scoreLog = new mongoose.Schema(
 		user: { type: String, ref: "User", required: true },
 		score: { type: Number, required: true },
 		reason: { type: String, required: true },
+		dayTag: { type: String, required: true },
 	},
 	{ timestamp: true, versionKey: false }
 );

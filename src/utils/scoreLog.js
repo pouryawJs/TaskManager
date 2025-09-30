@@ -1,23 +1,22 @@
 const sendReplyAndDelete = require("./sendReplyAndDelete");
 
 const increasedScoreLog = (total, addedScore, reason) => `
-🔥 <b> افزایش امتیاز</b> 🔥
+🔥 <b>افزایش امتیاز</b> 🔥
 
-📌 مقدار : </b>${addedScore}<b>
-📝 دلیل: ${reason}
+📌 مقدار: <b>${addedScore}</b>
+📝 دلیل: <b>${reason}</b>
 
 📊 مجموع امتیازات: <b>${total}</b>  
 `;
 
-const decreasedScoreLog = (total, addedScore, reason) => `
+const decreasedScoreLog = (total, decreasedScore, reason) => `
 ⚠️ <b>کسر امتیاز</b> ⚠️
 
-📌 مقدار : </b>${addedScore}<b>
-📝 دلیل: ${reason}
+📌 مقدار: <b>${decreasedScore}</b>
+📝 دلیل: <b>${reason}</b>
 
 📊 مجموع امتیازات: <b>${total}</b>  
 `;
-
 exports.sendLog = async (ctx, result, isIncrease) => {
 	const userTotalScore = result.user.score;
 	let logMessage = "";

@@ -125,6 +125,23 @@ exports.InProgressTask = (task, duration) => `
 `;
 
 //* PAST TASKS MESSAGES
+const reportTemplate = (date, totalScore, done, halfDone, notDone) => {
+	return `
+📅 <b>تاریخ روز:</b> ${date}
+⭐ <b>مجموع امتیازات کسب‌شده:</b> ${totalScore}
+
+✅ <b>تسک‌های انجام‌شده</b> (${done.length})
+${done.map((t, i) => `${i + 1}- ${t.title}`).join("\n") || "—"}
+
+⚠️ <b>تسک‌های نیمه‌تمام</b> (${halfDone.length})
+${halfDone.map((t, i) => `${i + 1}- ${t.title}`).join("\n") || "—"}
+
+❌ <b>تسک‌های انجام‌نشده</b> (${notDone.length})
+${notDone.map((t, i) => `${i + 1}- ${t.title}`).join("\n") || "—"}
+
+`;
+};
+
 exports.pastDays = () => {
 	return `📅 <b><i>روزهای گذشته</i></b>
 
@@ -132,8 +149,14 @@ exports.pastDays = () => {
 };
 exports.notFoundTask = (date) => `📅 <b>تاریخ روز:</b> ${date}
 
+
 ❌ هیچ تسکی برای شما در این روز وجود ندارد
 `;
+
+exports.tasksByDay = (date, totalScore, done, halfDone, notDone) => {
+	const reportMsg = reportTemplate(date, totalScore, done, halfDone, notDone);
+	return reportMsg;
+};
 //* GUIDE TASKS MESSAGES
 
 //* ANALYS TASKS MESSAGES

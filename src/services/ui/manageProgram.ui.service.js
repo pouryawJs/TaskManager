@@ -2,6 +2,7 @@ const manageProgramMessage = require("../../bot/messages/manageProgram.message")
 const manageProgramKeyboard = require("../../bot/keyboards/manageProgram.keyboard");
 const taskService = require("./../task.service");
 const userService = require("./../user.service");
+const scoreLogService = require("./../scoreLog.service");
 const { getTaskDurtationInMinute } = require("../../utils/dateUtils");
 const sendReplyAndDelete = require("../../utils/sendReplyAndDelete");
 const {
@@ -58,18 +59,35 @@ exports.showDayTasks = async (ctx) => {
 	const userID = ctx.from.id;
 
 	const tasks = await taskService.getUserTasksByDayTag(userID, dayTag);
-
-	if (!tasks) {
+	if (!tasks.length) {
 		return await ctx.editMessageText(
 			manageProgramMessage.notFoundTask(dayTag),
 			{
 				parse_mode: "HTML",
-				...manageProgramKeyboard.pastDays(page),
+				...manageProgramKeyboard.pastDayInformation(),
 			}
 		);
 	}
 
-	//! DEVELOPE
+	const totalScore = await scoreLogService.totalScoreOfDay(userID, dayTag);
+
+	const done = tasks.filter((t) => t.status === "تکمیل شده 🟢");
+	const halfDone = tasks.filter((t) => t.status === "نیمه تمام ماند 🟤");
+	const notDone = tasks.filter((t) => t.status === "انجام نشد 🔴");
+
+	return await ctx.editMessageText(
+		manageProgramMessage.tasksByDay(
+			dayTag,
+			totalScore,
+			done,
+			halfDone,
+			notDone
+		),
+		{
+			parse_mode: "HTML",
+			...manageProgramKeyboard.pastDayInformation(),
+		}
+	);
 };
 
 exports.showAnalysTasksMenu = async (ctx) => {
@@ -142,7 +160,7 @@ exports.cancelTaskLogic = async (ctx) => {
 	const duration = getTaskDurtationInMinute(task.start, task.end);
 	const result = await cancelTaskReward(chatID, duration);
 
-	return sendLog(ctx, result, true);
+	return sendLog(ctx, result, false);
 };
 
 exports.doneTaskLogic = async (ctx) => {

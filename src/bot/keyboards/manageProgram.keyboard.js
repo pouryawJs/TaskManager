@@ -2,10 +2,12 @@ const { Markup } = require("telegraf");
 const jalaali = require("jalaali-js");
 
 //* Get past dates in jalaali format
-const toJalaaliDate = (date) => {
-	const jDate = jalaali.toJalaali(date);
-	return `${jDate.jy}/${jDate.jm}/${jDate.jd}`;
-};
+function toJalaaliDate(date) {
+	const { jy, jm, jd } = jalaali.toJalaali(date);
+	const month = String(jm).padStart(2, "0");
+	const day = String(jd).padStart(2, "0");
+	return `${jy}/${month}/${day}`;
+}
 
 const getPast28Days = () => {
 	const today = new Date();
@@ -141,4 +143,9 @@ exports.InProgressTask = (taskID) =>
 			),
 		],
 		[Markup.button.callback("🚫 انجام ندادم", `NOT_DONE_TASK_${taskID}`)],
+	]);
+
+exports.pastDayInformation = () =>
+	Markup.inlineKeyboard([
+		[Markup.button.callback("⬅️ برگشت", "PAST_DAYS_PAGE_1")],
 	]);
