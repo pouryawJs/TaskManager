@@ -9,12 +9,3 @@ exports.createNewLog = async (user, score, reason, dayTag) => {
 
 	return log ? log : false;
 };
-
-exports.totalScoreOfDay = async (userId, dayTag) => {
-	const result = await ScoreLogModel.aggregate({
-		where: { userId, dayTag },
-		_sum: { score: true },
-	});
-
-	return result._sum.score || 0;
-};
