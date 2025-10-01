@@ -20,5 +20,5 @@ exports.incorrectEndTimeFormat = () => {
 exports.thanksForInformation = (endTime) => {
 	return `✅ ممنونم! ساعت پایان روزت روی <b>${endTime}</b> تنظیم شد.
     
-    <b>دکمه "بعدی" رو بزن تا به منوی اصلی بری.</b>`;
+    <b>دکمه "اتمام" رو بزن تا به منوی اصلی بری.</b>`;
 };

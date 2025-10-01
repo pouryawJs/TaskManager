@@ -2,6 +2,7 @@ const startHandler = require("./handlers/start.handler");
 const mainMenuHandler = require("./handlers/mainMenu.handlers");
 const manageProgramHandlers = require("./handlers/manageProgram.handlers");
 const informationHandler = require("./handlers/information.handler");
+const profileHandler = require("./handlers/profile.handler");
 const setupStage = require("./stage");
 
 module.exports = (bot) => {
@@ -13,4 +14,5 @@ module.exports = (bot) => {
 	mainMenuHandler(bot);
 	manageProgramHandlers(bot);
 	informationHandler(bot);
+	profileHandler(bot);
 };
