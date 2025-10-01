@@ -3,7 +3,6 @@ const manageProgramKeyboard = require("../../bot/keyboards/manageProgram.keyboar
 const taskService = require("./../task.service");
 const userService = require("./../user.service");
 const scoreLogService = require("./../scoreLog.service");
-const scoreLogService = require("./../scoreLog.service");
 const { getTaskDurtationInMinute } = require("../../utils/dateUtils");
 const sendReplyAndDelete = require("../../utils/sendReplyAndDelete");
 const {
@@ -61,7 +60,7 @@ exports.showDayTasks = async (ctx) => {
 
 	const tasks = await taskService.getUserTasksByDayTag(userID, dayTag);
 
-	if (!tasks) {
+	if (!tasks.length) {
 		return await ctx.editMessageText(
 			manageProgramMessage.notFoundTask(dayTag),
 			{
