@@ -15,10 +15,8 @@ exports.checkStartTaskJob = async (bot) => {
 			for (let task of tasks) {
 				await manageProgramUI.showStartedTask(bot, task);
 				sentTasks.push({
-					updateOne: {
-						filter: { _id: task._id },
-						update: { $set: { isSentNotification: true } },
-					},
+					id: task.id,
+					isSentNotification: true,
 				});
 			}
 

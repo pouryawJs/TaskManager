@@ -1,61 +1,62 @@
-const TaskModel = require("./../models/Task");
+const { PrismaClient } = require("@prisma/client");
+const prisma = new PrismaClient();
+const TaskModel = prisma.task;
 
 exports.insertManyTasks = async (tasks) => {
-	const result = await TaskModel.insertMany(tasks);
-	if (result.insertedCount === 0) {
+	const result = await TaskModel.createMany({ data: tasks });
+
+	if (result.count === 0) {
 		return false;
 	}
+
 	return true;
 };
 
 exports.getUserTasksByDayTag = async (userID, dayTag) => {
-	const tasks = await TaskModel.aggregate([
-		{ $match: { user: String(userID), dayTag: String(dayTag) } },
-		{
-			$addFields: {
-				sortHour: {
-					$toInt: { $arrayElemAt: [{ $split: ["$start", ":"] }, 0] },
-				},
-				sortMinute: {
-					$toInt: { $arrayElemAt: [{ $split: ["$start", ":"] }, 1] },
-				},
-			},
-		},
-		{ $sort: { sortHour: 1, sortMinute: 1 } },
-	]);
+	const tasks = await prisma.$queryRaw`
+		SELECT * FROM "Task"
+		WHERE "userId" = ${Number(userID)} AND "dayTag" = ${dayTag}
+		ORDER BY split_part("start", ':', 1)::int,
+				split_part("start", ':', 2)::int;
+		`;
 	return tasks;
 };
 
 exports.deleteTaskByID = async (taskID) => {
-	await TaskModel.findByIdAndDelete(taskID);
+	await TaskModel.delete({ where: { id: Number(taskID) } });
 	return;
 };
 
 exports.findTasksByStartTime = async (start) => {
-	const tasks = await TaskModel.find({
-		start,
-		isSentNotification: false,
-	}).lean();
+	const tasks = await TaskModel.findMany({ where: { start } });
 
 	return tasks;
 };
 
 exports.updateTaskStatus = async (taskID, status) => {
-	const updatedTask = await TaskModel.findByIdAndUpdate(
-		taskID,
-		{ status },
-		{ new: true }
-	);
+	const updatedTask = await TaskModel.update({
+		where: { id: Number(taskID) },
+		data: { status },
+	});
 
 	return updatedTask ? updatedTask : false;
 };
 
 exports.updateTasksAfterSentNotification = async (tasks) => {
-	await TaskModel.bulkWrite(tasks);
+	await Promise.all(
+		tasks.map(async (task) => {
+			await TaskModel.update({
+				where: { id: task.id },
+				data: { isSentNotification: task.isSentNotification },
+			});
+		})
+	);
 	return;
 };
 
 exports.isFirstTaskInDayTag = async (userID, dayTag) => {
-	const task = await TaskModel.findOne({ user: userID, dayTag });
+	const task = await TaskModel.findFirst({
+		where: { userId: Number(userID), dayTag },
+	});
 	return task ? false : true;
 };

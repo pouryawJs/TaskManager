@@ -1,6 +1,5 @@
 require("dotenv").config();
 const configs = require("./configs");
-require("./src/configs/db")();
 const { Telegraf, Markup } = require("telegraf");
 const setupHandlers = require("./src/bot/index");
 const setupCrons = require("./src/cron");

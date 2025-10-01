@@ -2,10 +2,12 @@ const { Markup } = require("telegraf");
 const jalaali = require("jalaali-js");
 
 //* Get past dates in jalaali format
-const toJalaaliDate = (date) => {
-	const jDate = jalaali.toJalaali(date);
-	return `${jDate.jy}/${jDate.jm}/${jDate.jd}`;
-};
+function toJalaaliDate(date) {
+	const { jy, jm, jd } = jalaali.toJalaali(date);
+	const month = String(jm).padStart(2, "0");
+	const day = String(jd).padStart(2, "0");
+	return `${jy}/${month}/${day}`;
+}
 
 const getPast28Days = () => {
 	const today = new Date();
@@ -67,10 +69,8 @@ const buildTaskTagsKeyboard = (tasks) => {
 	const buttons = [];
 
 	tasks.forEach((task) => {
-		const tag = task._id.toString().slice(-4);
-		currentRow.push(
-			Markup.button.callback(tag, `TASK_DELETE_${task._id.toString()}`)
-		);
+		const tag = task.id;
+		currentRow.push(Markup.button.callback(tag, `TASK_DELETE_${task.id}`));
 		rowTagCounter++;
 		if (rowTagCounter === rowTagLimit) {
 			buttons.push(currentRow);
@@ -141,4 +141,9 @@ exports.InProgressTask = (taskID) =>
 			),
 		],
 		[Markup.button.callback("🚫 انجام ندادم", `NOT_DONE_TASK_${taskID}`)],
+	]);
+
+exports.pastDayInformation = () =>
+	Markup.inlineKeyboard([
+		[Markup.button.callback("⬅️ برگشت", "PAST_DAYS_PAGE_1")],
 	]);

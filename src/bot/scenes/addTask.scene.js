@@ -71,7 +71,7 @@ const addTaskScene = new WizardScene(
 						45000
 					);
 				}
-				tasks.push({ ...taskProperties, dayTag, user: userID });
+				tasks.push({ ...taskProperties, dayTag, userId: userID });
 			}
 			//* Reward/Punish Calculation
 			const isFirstTask = await taskService.isFirstTaskInDayTag(

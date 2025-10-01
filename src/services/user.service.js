@@ -1,30 +1,36 @@
-const UserModel = require("./../models/User");
+const { PrismaClient } = require("@prisma/client");
+const prisma = new PrismaClient();
+const UserModel = prisma.user;
 const jalaali = require("jalaali-js");
 
 exports.isExistsUser = async (userID) => {
-	const user = await UserModel.findOne({ _id: userID });
+	const user = await UserModel.findUnique({ where: { id: Number(userID) } });
 
 	return user ? user : false;
 };
 
 exports.createUser = async (userID) => {
-	const user = await UserModel.create({ _id: userID });
+	const user = await UserModel.create({ data: { id: Number(userID) } });
 
 	return user ? user : false;
 };
 
 exports.getUserCurrentDayTag = async (userID) => {
-	const user = await UserModel.findOne({ _id: userID });
-
+	const user = await UserModel.findUnique({ where: { id: Number(userID) } });
 	const now = new Date();
 
-	const startHour = user.end_time || 0;
+	const [endHour, endMinute] = (user.endTime || "0:0").split(":").map(Number);
+
+	// set end time today
+	const endTimeToday = new Date(now);
+	endTimeToday.setHours(endHour, endMinute, 0, 0);
 
 	let effectiveDate = new Date(now);
-	if (now.getHours() < startHour) {
+	if (now < endTimeToday) {
 		effectiveDate.setDate(now.getDate() - 1);
 	}
 
+	// Convert to Jalaali
 	const j = jalaali.toJalaali(
 		effectiveDate.getFullYear(),
 		effectiveDate.getMonth() + 1,
@@ -39,19 +45,19 @@ exports.getUserCurrentDayTag = async (userID) => {
 };
 
 exports.updateUserScore = async (userID, amount) => {
-	const updatedUser = await UserModel.findByIdAndUpdate(
-		userID,
-		{ $inc: { score: amount } },
-		{ new: true }
-	).select("_id score");
+	const updatedUser = await UserModel.update({
+		where: { id: Number(userID) },
+		data: { score: { increment: amount } },
+		select: { id: true, score: true },
+	});
 
 	return updatedUser ? updatedUser : false;
 };
 
 exports.getLimitTimeInMinute = async (userID) => {
-	const user = await UserModel.findById(userID);
+	const user = await UserModel.findUnique({ where: { id: Number(userID) } });
 
-	const end = user.end_time;
+	const end = user.endTime || "00:00";
 	const [hour, minute] = end.split(":").map(Number);
 	const endInMinute = hour * 60 + minute;
 
