@@ -63,3 +63,11 @@ exports.getLimitTimeInMinute = async (userID) => {
 
 	return endInMinute + 8 * 60; // 8 hour after end day
 };
+
+exports.updateUserEndTime = async (userID, endTime) => {
+	const updatedUser = await UserModel.update({
+		where: { id: Number(userID) },
+		data: { endTime },
+	});
+	return updatedUser ? updatedUser : false;
+};

@@ -1,3 +1,5 @@
+const sendReplyAndDelete = require("./sendReplyAndDelete");
+
 function safeAction(bot, pattern, handler) {
 	bot.action(pattern, async (ctx) => {
 		try {
@@ -15,7 +17,12 @@ function safeAction(bot, pattern, handler) {
 		} catch (err) {
 			console.error("safeAction error:", err);
 			try {
-				await ctx.reply("یه خطایی پیش اومد، دوباره امتحان کن 🚧");
+				await sendReplyAndDelete(
+					ctx,
+					"یه خطایی پیش اومد، دوباره امتحان کن 🚧",
+					undefined,
+					5000
+				);
 			} catch {}
 		}
 	});
