@@ -16,6 +16,25 @@ const { sendLog } = require("../../utils/scoreLog");
 const TASK_REGEX =
 	/^(.+?)\s+از\s+([01]\d|2[0-3]):([0-5]\d)\s+تا\s+([01]\d|2[0-3]):([0-5]\d)\s*$/;
 
+function buildDateTimeFromHM(hmString) {
+	const [hour, minute] = hmString.split(":").map(Number);
+
+	// current date in Tehran
+	const now = new Date();
+
+	const startAtUTC = new Date(
+		Date.UTC(
+			now.getFullYear(),
+			now.getMonth(),
+			now.getDate(),
+			hour - 3,
+			minute - 30
+		)
+	);
+
+	return startAtUTC.toISOString();
+}
+
 const parseTaskProperties = (text) => {
 	const taskMessage = text.trim().match(TASK_REGEX);
 	if (!taskMessage) return null;
@@ -24,7 +43,14 @@ const parseTaskProperties = (text) => {
 	const start = `${taskMessage[2]}:${taskMessage[3]}`;
 	const end = `${taskMessage[4]}:${taskMessage[5]}`;
 
-	return { title, start, end };
+	let startAt = buildDateTimeFromHM(start);
+	let endAt = buildDateTimeFromHM(end);
+
+	if (endAt < startAt) {
+		endAt.setDate(endAt.getDate() + 1);
+	}
+
+	return { title, start, end, startAt, endAt };
 };
 
 const addTaskScene = new WizardScene(

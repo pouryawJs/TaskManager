@@ -102,7 +102,7 @@ exports.showAnalysTasksMenu = async (ctx) => {
 
 exports.showStartedTask = async (bot, task) => {
 	const duration = getTaskDurtationInMinute(task.start, task.end);
-	await bot.telegram.sendMessage(
+	const sentMsg = await bot.telegram.sendMessage(
 		task.userId,
 		manageProgramMessage.startedTask(task, duration),
 		{
@@ -110,12 +110,13 @@ exports.showStartedTask = async (bot, task) => {
 			...manageProgramKeyboard.startedTask(task.id),
 		}
 	);
+	return sentMsg.message_id;
 };
 
 exports.showInProgressTask = async (ctx) => {
 	const taskID = ctx.match[1];
 
-	const task = await taskService.updateTaskStatus(taskID, "درحال انجام 🟡");
+	const task = await taskService.findTaskById(taskID);
 
 	if (!task) {
 		return await sendReplyAndDelete(
@@ -236,4 +237,15 @@ exports.notDoneTaskLogic = async (ctx) => {
 	const result = await notDoneTaskReward(chatID, duration);
 
 	return sendLog(ctx, result, false);
+};
+
+exports.sendExpiredTaskNotif = async (bot, task) => {
+	await bot.telegram.deleteMessage(task.userId, task.notificationMsgId);
+	await bot.telegram.sendMessage(
+		task.userId,
+		manageProgramMessage.expiredTask(task),
+		{
+			parse_mode: "HTML",
+		}
+	);
 };

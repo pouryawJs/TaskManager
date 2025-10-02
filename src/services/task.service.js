@@ -2,6 +2,10 @@ const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 const TaskModel = prisma.task;
 
+exports.findTaskById = async (taskID) => {
+	return await TaskModel.findUnique({ where: { id: Number(taskID) } });
+};
+
 exports.insertManyTasks = async (tasks) => {
 	const result = await TaskModel.createMany({ data: tasks });
 
@@ -28,7 +32,9 @@ exports.deleteTaskByID = async (taskID) => {
 };
 
 exports.findTasksByStartTime = async (start) => {
-	const tasks = await TaskModel.findMany({ where: { start } });
+	const tasks = await TaskModel.findMany({
+		where: { startAt: { lte: start }, notificationMsgId: 0 },
+	});
 
 	return tasks;
 };
@@ -47,7 +53,10 @@ exports.updateTasksAfterSentNotification = async (tasks) => {
 		tasks.map(async (task) => {
 			await TaskModel.update({
 				where: { id: task.id },
-				data: { isSentNotification: task.isSentNotification },
+				data: {
+					notificationMsgId: task.notificationMsgId,
+					status: task.status,
+				},
 			});
 		})
 	);
@@ -63,6 +72,15 @@ exports.isFirstTaskInDayTag = async (userID, dayTag) => {
 
 exports.findAllUserTasks = async (userId) => {
 	const tasks = await TaskModel.findMany({ where: { userId } });
+
+	return tasks;
+};
+
+exports.findAndUpdateExpiredTasks = async (thirtyMinutesAgo) => {
+	const tasks = await TaskModel.updateManyAndReturn({
+		where: { endAt: { lte: thirtyMinutesAgo }, status: "درحال انجام 🟡" },
+		data: { status: "نیمه تمام ماند 🟤" },
+	});
 
 	return tasks;
 };
