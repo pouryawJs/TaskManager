@@ -125,7 +125,14 @@ exports.InProgressTask = (task, duration) => `
 `;
 
 //* PAST TASKS MESSAGES
-const reportTemplate = (date, totalScore, done, halfDone, notDone) => {
+const reportTemplate = (
+	date,
+	totalScore,
+	done,
+	halfDone,
+	notDone,
+	canceled
+) => {
 	return `
 📅 <b>تاریخ روز:</b> ${date}
 ⭐ <b>مجموع امتیازات کسب‌شده:</b> ${totalScore}
@@ -139,6 +146,8 @@ ${halfDone.map((t, i) => `${i + 1}- ${t.title}`).join("\n") || "—"}
 ❌ <b>تسک‌های انجام‌نشده</b> (${notDone.length})
 ${notDone.map((t, i) => `${i + 1}- ${t.title}`).join("\n") || "—"}
 
+⛔️ <b>تسک‌های لغو شده</b> (${canceled.length})
+${canceled.map((t, i) => `${i + 1}- ${t.title}`).join("\n") || "—"}
 `;
 };
 
@@ -153,8 +162,15 @@ exports.notFoundTask = (date) => `📅 <b>تاریخ روز:</b> ${date}
 ❌ هیچ تسکی برای شما در این روز وجود ندارد
 `;
 
-exports.tasksByDay = (date, totalScore, done, halfDone, notDone) => {
-	const reportMsg = reportTemplate(date, totalScore, done, halfDone, notDone);
+exports.tasksByDay = (date, totalScore, done, halfDone, notDone, canceled) => {
+	const reportMsg = reportTemplate(
+		date,
+		totalScore,
+		done,
+		halfDone,
+		notDone,
+		canceled
+	);
 	return reportMsg;
 };
 //* GUIDE TASKS MESSAGES

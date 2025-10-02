@@ -75,6 +75,7 @@ exports.showDayTasks = async (ctx) => {
 	const done = tasks.filter((t) => t.status === "تکمیل شده 🟢");
 	const halfDone = tasks.filter((t) => t.status === "نیمه تمام ماند 🟤");
 	const notDone = tasks.filter((t) => t.status === "انجام نشد 🔴");
+	const canceled = tasks.filter((t) => t.status === "لغو شده ⛔️");
 
 	return await ctx.editMessageText(
 		manageProgramMessage.tasksByDay(
@@ -82,7 +83,8 @@ exports.showDayTasks = async (ctx) => {
 			totalScore,
 			done,
 			halfDone,
-			notDone
+			notDone,
+			canceled
 		),
 		{
 			parse_mode: "HTML",

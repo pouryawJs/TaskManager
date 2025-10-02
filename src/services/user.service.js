@@ -3,7 +3,7 @@ const prisma = new PrismaClient();
 const UserModel = prisma.user;
 const jalaali = require("jalaali-js");
 
-exports.isExistsUser = async (userID) => {
+exports.findUser = async (userID) => {
 	const user = await UserModel.findUnique({ where: { id: Number(userID) } });
 
 	return user ? user : false;

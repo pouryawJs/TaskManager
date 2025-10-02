@@ -60,3 +60,9 @@ exports.isFirstTaskInDayTag = async (userID, dayTag) => {
 	});
 	return task ? false : true;
 };
+
+exports.findAllUserTasks = async (userId) => {
+	const tasks = await TaskModel.findMany({ where: { userId } });
+
+	return tasks;
+};

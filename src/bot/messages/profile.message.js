@@ -1,16 +1,25 @@
-exports.pofile = () => {
+exports.pofile = (
+	totalScore,
+	doneLen,
+	halfDoneLen,
+	notDoneLen,
+	canceledLen,
+	endTime
+) => {
 	return `👤 <b>پروفایل کاربری</b>
 
-⭐ <b>امتیاز فعلی:</b> 120
+⭐ <b>امتیاز فعلی:</b> ${totalScore}
 
-📝 <b>وضعیت تسک‌ها</b>
-   ✅ تکمیل شده: 15
-   ⚠️ نیمه‌تمام: 3
-   ❌ انجام‌نشده: 5
-   🚫 لغو شده: 2
-   📌 مجموع کل: 25
+📝 <b>وضعیت تسک‌ ها</b>
 
-⏰ <b>ساعت پایان روز:</b> 23:30
+   ✅ تکمیل شده: ${doneLen}
+   ⚠️ نیمه‌ تمام: ${halfDoneLen}
+   ❌ انجام‌ نشده: ${notDoneLen}
+   🚫 لغو شده: ${canceledLen}
+
+   📌 مجموع کل: ${doneLen + halfDoneLen + notDoneLen + canceledLen}
+
+⏰ <b>ساعت پایان روز:</b> ${endTime}
 
 ⚙️ برای تغییر ساعت پایان روز، گزینه زیر را انتخاب کنید 👇
 `;

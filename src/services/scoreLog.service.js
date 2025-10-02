@@ -18,3 +18,16 @@ exports.totalScoreOfDay = async (userId, dayTag) => {
 
 	return result._sum.score || 0;
 };
+
+exports.totalScoreOfUser = async (userId) => {
+	const total = await ScoreLogModel.aggregate({
+		where: {
+			userId,
+		},
+		_sum: {
+			score: true,
+		},
+	});
+
+	return total._sum.score || 0;
+};

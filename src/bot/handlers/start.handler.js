@@ -14,7 +14,7 @@ module.exports = (bot) => {
 		//* check user
 		const userTgID = ctx.from.id;
 
-		let user = await userService.isExistsUser(userTgID);
+		let user = await userService.findUser(userTgID);
 		if (!user) {
 			user = await userService.createUser(userTgID);
 		}
