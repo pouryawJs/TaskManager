@@ -241,11 +241,4 @@ exports.notDoneTaskLogic = async (ctx) => {
 
 exports.sendExpiredTaskNotif = async (bot, task) => {
 	await bot.telegram.deleteMessage(task.userId, task.notificationMsgId);
-	await bot.telegram.sendMessage(
-		task.userId,
-		manageProgramMessage.expiredTask(task),
-		{
-			parse_mode: "HTML",
-		}
-	);
 };

@@ -4,6 +4,7 @@ const manageProgramHandlers = require("./handlers/manageProgram.handlers");
 const informationHandler = require("./handlers/information.handler");
 const profileHandler = require("./handlers/profile.handler");
 const setupStage = require("./stage");
+const adminHandler = require("./handlers/admin.handler");
 
 module.exports = (bot) => {
 	// scenes
@@ -15,4 +16,5 @@ module.exports = (bot) => {
 	manageProgramHandlers(bot);
 	informationHandler(bot);
 	profileHandler(bot);
+	adminHandler(bot);
 };

@@ -13,10 +13,11 @@ module.exports = (bot) => {
 		}
 		//* check user
 		const userTgID = ctx.from.id;
+		const username = ctx.from.username;
 
 		let user = await userService.findUser(userTgID);
 		if (!user) {
-			user = await userService.createUser(userTgID);
+			user = await userService.createUser(userTgID, username);
 		}
 
 		ctx.reply(startMessage(), { parse_mode: "HTML", ...startKeyboard });
