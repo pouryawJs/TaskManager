@@ -14,7 +14,7 @@ datasource db {
 }
 
 model User {
-  id        Int   @id
+  id        BigInt   @id
   username String  @default("None")
   score     Int      @default(0)
   endTime   String   @default("00:00")
@@ -32,14 +32,14 @@ model Task {
   endAt DateTime
   dayTag String
   user  User  @relation(fields: [userId], references: [id])
-  userId  Int
+  userId  BigInt
   notificationMsgId Int @default(0)
 }
 
 model ScoreLog {
   id     Int    @id @default(autoincrement())
   user   User   @relation(fields: [userId], references: [id])
-  userId Int
+  userId BigInt
   score  Int
   reason String
   dayTag String
