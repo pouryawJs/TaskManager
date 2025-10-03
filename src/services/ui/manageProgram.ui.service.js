@@ -103,7 +103,7 @@ exports.showAnalysTasksMenu = async (ctx) => {
 exports.showStartedTask = async (bot, task) => {
 	const duration = getTaskDurtationInMinute(task.start, task.end);
 	const sentMsg = await bot.telegram.sendMessage(
-		task.userId,
+		String(task.userId),
 		manageProgramMessage.startedTask(task, duration),
 		{
 			parse_mode: "HTML",
@@ -159,7 +159,7 @@ exports.cancelTaskLogic = async (ctx) => {
 	}
 	//* Calculate and give score to user
 	const chatID = task.userId;
-	await ctx.telegram.deleteMessage(chatID, messageID);
+	await ctx.telegram.deleteMessage(String(chatID), messageID);
 
 	const duration = getTaskDurtationInMinute(task.start, task.end);
 	const result = await cancelTaskReward(chatID, duration);
@@ -182,7 +182,7 @@ exports.doneTaskLogic = async (ctx) => {
 	}
 	//* Calculate and give score to user
 	const chatID = task.userId;
-	await ctx.telegram.deleteMessage(chatID, messageID);
+	await ctx.telegram.deleteMessage(String(chatID), messageID);
 
 	const duration = getTaskDurtationInMinute(task.start, task.end);
 	const result = await doneTaskReward(chatID, duration);
@@ -208,7 +208,7 @@ exports.halfDoneTaskLogic = async (ctx) => {
 	}
 	//* Calculate and give score to user
 	const chatID = task.userId;
-	await ctx.telegram.deleteMessage(chatID, messageID);
+	await ctx.telegram.deleteMessage(String(chatID), messageID);
 
 	const duration = getTaskDurtationInMinute(task.start, task.end);
 	const result = await halfDoneTaskReward(chatID, duration);
@@ -231,7 +231,7 @@ exports.notDoneTaskLogic = async (ctx) => {
 	}
 	//* Calculate and give score to user
 	const chatID = task.userId;
-	await ctx.telegram.deleteMessage(chatID, messageID);
+	await ctx.telegram.deleteMessage(String(chatID), messageID);
 
 	const duration = getTaskDurtationInMinute(task.start, task.end);
 	const result = await notDoneTaskReward(chatID, duration);
@@ -240,5 +240,8 @@ exports.notDoneTaskLogic = async (ctx) => {
 };
 
 exports.sendExpiredTaskNotif = async (bot, task) => {
-	await bot.telegram.deleteMessage(task.userId, task.notificationMsgId);
+	await bot.telegram.deleteMessage(
+		String(task.userId),
+		task.notificationMsgId
+	);
 };

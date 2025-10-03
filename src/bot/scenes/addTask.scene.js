@@ -46,10 +46,6 @@ const parseTaskProperties = (text) => {
 	let startAt = buildDateTimeFromHM(start);
 	let endAt = buildDateTimeFromHM(end);
 
-	if (endAt < startAt) {
-		endAt.setDate(endAt.getDate() + 1);
-	}
-
 	return { title, start, end, startAt, endAt };
 };
 
@@ -121,7 +117,7 @@ const addTaskScene = new WizardScene(
 			const addTasksResult = await taskService.insertManyTasks(tasks);
 
 			if (!addTasksResult) {
-				await ctx.telegram.deleteMessage(chatID, messageID);
+				await ctx.telegram.deleteMessage(String(chatID), messageID);
 				await sendReplyAndDelete(
 					ctx,
 					manageProgramMessage.addTaskInsertionErr(),
@@ -130,7 +126,7 @@ const addTaskScene = new WizardScene(
 				);
 			}
 			//* Response
-			await ctx.telegram.deleteMessage(chatID, messageID);
+			await ctx.telegram.deleteMessage(String(chatID), messageID);
 			await sendReplyAndDelete(
 				ctx,
 				manageProgramMessage.addTaskSuccess(tasks.length),

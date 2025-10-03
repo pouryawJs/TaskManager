@@ -2,6 +2,7 @@ const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 const UserModel = prisma.user;
 const jalaali = require("jalaali-js");
+const { DateTime } = require("luxon");
 
 exports.getAllActivatedUsers = async () => {
 	const users = await UserModel.findMany({
@@ -26,25 +27,40 @@ exports.createUser = async (userID, username) => {
 
 exports.getUserCurrentDayTag = async (userID) => {
 	const user = await UserModel.findUnique({ where: { id: Number(userID) } });
+	const tz = "Asia/Tehran";
 
-	const now = new Date();
+	// TEHRAN TIME
+	const nowTehran = DateTime.now().setZone(tz);
 
-	const [endHour, endMinute] = (user.endTime || "0:0").split(":").map(Number);
+	const [endHour, endMinute] = (user?.endTime || "0:0")
+		.split(":")
+		.map(Number);
 
-	const endTimeToday = new Date(now);
-	endTimeToday.setHours(endHour, endMinute, 0, 0);
+	let endToday = DateTime.fromObject(
+		{
+			year: nowTehran.year,
+			month: nowTehran.month,
+			day: nowTehran.day,
+			hour: endHour,
+			minute: endMinute,
+			second: 0,
+			millisecond: 0,
+		},
+		{ zone: tz }
+	);
 
-	let effectiveDate = new Date(now);
-
-	if (now > endTimeToday) {
-		effectiveDate.setDate(effectiveDate.getDate() + 1);
+	let lastEnd;
+	if (endToday <= nowTehran) {
+		lastEnd = endToday;
+	} else {
+		lastEnd = endToday.minus({ days: 1 });
 	}
 
-	const j = jalaali.toJalaali(
-		effectiveDate.getFullYear(),
-		effectiveDate.getMonth() + 1,
-		effectiveDate.getDate()
-	);
+	const gYear = lastEnd.year;
+	const gMonth = lastEnd.month;
+	const gDay = lastEnd.day;
+
+	const j = jalaali.toJalaali(gYear, gMonth, gDay);
 
 	const year = j.jy;
 	const month = String(j.jm).padStart(2, "0");

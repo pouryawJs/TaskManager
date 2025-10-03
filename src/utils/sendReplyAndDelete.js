@@ -10,9 +10,12 @@ module.exports = async (ctx, replyText, userMessageID, timeToDelete) => {
 		setTimeout(async () => {
 			try {
 				if (userMessageID) {
-					await ctx.telegram.deleteMessage(chatId, userMessageID);
+					await ctx.telegram.deleteMessage(
+						String(chatId),
+						userMessageID
+					);
 				}
-				await ctx.telegram.deleteMessage(chatId, botMessageID);
+				await ctx.telegram.deleteMessage(String(chatId), botMessageID);
 			} catch (e) {
 				return console.log(e);
 			}
