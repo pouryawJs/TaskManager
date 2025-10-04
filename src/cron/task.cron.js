@@ -37,7 +37,7 @@ exports.checkEndedTaskJob = async (bot) => {
 	// Each Minute
 	cron.schedule("* * * * *", async () => {
 		try {
-			const thirtyMinutesAgo = new Date(Date.now() - 1 * 60 * 1000);
+			const thirtyMinutesAgo = new Date(Date.now() - 30 * 60 * 1000);
 
 			const tasks = await taskService.findAndUpdateExpiredTasks(
 				thirtyMinutesAgo
