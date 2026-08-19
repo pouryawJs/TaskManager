@@ -14,6 +14,7 @@ module.exports = (bot) => {
 		//* check user
 		const userTgID = ctx.from.id;
 		const username = ctx.from.username;
+		console.log(ctx.chat);
 
 		let user = await userService.findUser(userTgID);
 		if (!user) {

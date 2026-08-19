@@ -1,11 +1,11 @@
 {
 	"name": "task-manager",
 	"version": "1.0.0",
-	"main": "index.js",
+	"main": "app.js",
 	"scripts": {
 		"dev": "node app.js",
 		"migrate": "prisma migrate deploy && prisma generate",
-		"start": "npm run migrate && npm run dev"
+		"start": "node app.js"
 	},
 	"keywords": [],
 	"author": "",

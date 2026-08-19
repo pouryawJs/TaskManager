@@ -12,19 +12,25 @@ exports.getAllActivatedUsers = async () => {
 };
 
 exports.findUser = async (userID) => {
-	const user = await UserModel.findUnique({ where: { id: Number(userID) } });
+	const user = await UserModel.findUnique({
+		where: {
+			id: BigInt(userID),
+		},
+	});
 
-	return user ? user : false;
+	return user || false;
 };
 
 exports.createUser = async (userID, username) => {
 	const user = await UserModel.create({
-		data: { id: Number(userID), username: username ? username : "None" },
+		data: {
+			id: BigInt(userID),
+			username: username || "None",
+		},
 	});
 
-	return user ? user : false;
+	return user || false;
 };
-
 exports.getUserCurrentDayTag = async (userID) => {
 	const user = await UserModel.findUnique({ where: { id: Number(userID) } });
 	const tz = "Asia/Tehran";
@@ -46,7 +52,7 @@ exports.getUserCurrentDayTag = async (userID) => {
 			second: 0,
 			millisecond: 0,
 		},
-		{ zone: tz }
+		{ zone: tz },
 	);
 
 	let lastEnd;
