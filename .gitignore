@@ -2,4 +2,6 @@ node_modules
 package-lock.json
 /src/generated/prisma
 .env
+.env.*
+!.env.example
 /prisma/migrations
